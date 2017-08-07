@@ -14,10 +14,10 @@ import de.ovolynets.discussiontree.persistence.DatabaseService;
 @Service
 public class DatabaseServiceImpl implements DatabaseService {
 
-    private List<MessageEntry> roots = Lists.newArrayList(new MessageEntry("123", 1, null));
+    private List<MessageEntry> roots = Lists.newArrayList();
 
     // Keep it as the counter for all posts
-    private AtomicInteger counter = new AtomicInteger(0);
+    private AtomicInteger counter = new AtomicInteger(1);
 
     @Override
     public int addNew(final String text) {
@@ -27,7 +27,14 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void addReply(final int postId, final String text) { }
+    public Optional<Integer> addReply(final int postId, final String text) {
+        return get(postId).map(entry -> {
+                int newCounter = counter.incrementAndGet();
+                MessageEntry newEntry = new MessageEntry(text, newCounter, Lists.newArrayList());
+                entry.getChildren().add(newEntry);
+                return newCounter;
+            });
+    }
 
     @Override
     public Optional<MessageEntry> get(final int postId) {
@@ -35,5 +42,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void delete(final int postId) { }
+    public Optional<MessageEntry> delete(final int postId) {
+        return roots.stream().filter(entry -> entry.delete(postId) != null).findAny();
+    }
 }

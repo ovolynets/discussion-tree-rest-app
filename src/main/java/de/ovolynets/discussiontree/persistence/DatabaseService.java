@@ -8,9 +8,9 @@ public interface DatabaseService {
 
     int addNew(String text);
 
-    void addReply(int postId, String text);
+    Optional<Integer> addReply(int postId, String text);
 
     Optional<MessageEntry> get(int postId);
 
-    void delete(int postId);
+    Optional<MessageEntry> delete(int postId);
 }

@@ -2,7 +2,6 @@ package de.ovolynets.discussiontree.domain;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class MessageEntry {
 
@@ -32,8 +31,23 @@ public class MessageEntry {
         if (postId == id) {
             return Optional.of(this);
         } else {
-            Stream<MessageEntry> optionalStream = children.stream().filter(entry -> entry.find(postId) != null);
-            return optionalStream.findFirst();
+            return children.stream().filter(entry -> entry.find(postId) != null).findFirst();
+        }
+    }
+
+    public Optional<MessageEntry> delete(final int postId) {
+        // This part may not be fully complete. It should search for the entry in the children and delete it from there
+
+        Optional<MessageEntry> maybeDeletedEntry = children.stream().filter(entry1 ->
+                                                                   entry1.id == postId).findAny().map(entry -> {
+                                                               children.remove(entry);
+                                                               return entry;
+                                                           });
+
+        if (maybeDeletedEntry.isPresent()) {
+            return maybeDeletedEntry;
+        } else {
+            return children.stream().filter(entry -> entry.delete(postId) != null).findAny();
         }
     }
 }

@@ -4,4 +4,4 @@
 
  * have HATEOAS on replying to requests
  * no error handling
- 
+ * delete functionality is not complete
